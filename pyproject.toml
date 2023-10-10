@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "homepress"
+version = "0.1.0"
+description = "An All in One Home based book printing software solution. Can be used as a library."
+authors = ["Amaan Ahmad Khan"]
+license = "MIT License"
+readme = "README.md"
+packages = [{include = "homepress"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pypdf = "^3.16.3"
+tqdm = "^4.66.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
