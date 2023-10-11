@@ -96,12 +96,19 @@ def single_stack_midpage(inputfile: str, outputfile: Union[str, Tuple[str, str]]
         
         if flip_even:
             if progressbar:
-                iterobj = tqdm(range(1, len(writer.pages), 2))
+                iterobj = tqdm(range(len(writer.pages)))
             else:
-                iterobj = range(1, len(writer.pages), 2)
+                iterobj = range(len(writer.pages))
+
+            nw = pypdf.PdfWriter()
             for x in iterobj:
-                writer.pages[x] = writer.pages[x].rotate(180)
-                writer.pages[x].transfer_rotation_to_content()
+                if x % 2 == 1:
+                    page = writer.pages[x].rotate(180)
+                    page.transfer_rotation_to_content()
+                    nw.add_page(page)
+                else:
+                    nw.add_page(writer.pages[x])
+            writer = nw
         if separate_even_odd_output:
             writer_odd = pypdf.PdfWriter()
             writer_even = pypdf.PdfWriter()
