@@ -6,3 +6,9 @@
 
 * Command Line Interface (CLI) added
 * Fixed Right to Left, separation for midpage binding pdf algorithm
+
+0.3
+
+* Added multi stacks midpage binding algorithm
+* Added a parameter input_page_range to single stack midpage algorithm
+* renamed cli to "homepress" from "homepress_cli"
