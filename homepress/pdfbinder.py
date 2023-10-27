@@ -212,8 +212,9 @@ def single_stack_midpage(inputfile: str, outputfile: Union[str, Tuple[str, str]]
             number_pages = input_page_range[1] - input_page_range[0]
             pageorder = bindermath.doubleside_singlestack_midpage(number_pages)
 
-        _start = input_page_range[0]
-        _end = input_page_range[1]
+        if input_page_range is not None:
+            _start = input_page_range[0]
+            _end = input_page_range[1]
         pageorderflattened = []
         for x in pageorder:
             if input_page_range is None:
