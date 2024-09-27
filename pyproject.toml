@@ -9,9 +9,9 @@ packages = [{include = "homepress"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-pypdf = "^3.16.3"
+PyMuPDF = "^1.24.10"
 tqdm = "^4.66.1"
-
+pillow = "^10.4.0"
 
 [build-system]
 requires = ["poetry-core"]
