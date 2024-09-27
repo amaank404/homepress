@@ -1,13 +1,14 @@
 from .mupdf_renderer import MuPDFRenderer
+from .pil_renderer import PILRenderer
 from .multi_renderer import MultiRenderer
 from pathlib import Path
 import logging
 
-renderers = [MuPDFRenderer]
+renderers = [MuPDFRenderer, PILRenderer]
 
-formats = []
+formats = set()
 for x in renderers:
-    formats.extend(x.supported_extensions)
+    formats.update(x.supported_extensions)
 
 def get_renderer(files, ignore_errors=False):
     global renderers
