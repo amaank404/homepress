@@ -1,6 +1,8 @@
 from pathlib import Path
+
+from .layout import pages
 from .renderer import get_renderer
-from . import pages, progress
+from . import progress
 import PIL
 import pymupdf
 import time
