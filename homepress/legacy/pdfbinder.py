@@ -20,7 +20,7 @@ thick books sometimes)
 """
 
 import pypdf
-from . import bindermath
+from .. import bindermath
 from tqdm import tqdm
 import os
 from typing import Union, Tuple
