@@ -4,13 +4,19 @@ from .multi_renderer import MultiRenderer
 from pathlib import Path
 import logging
 
+# All the supported renderers
 renderers = [MuPDFRenderer, PILRenderer]
 
+# All the supported formats
 formats = set()
 for x in renderers:
     formats.update(x.supported_extensions)
 
 def get_renderer(files, ignore_errors=False):
+    """
+    Given a set of files (May contain recursivly traversed folders), return a renderer that
+    aggregates all the given files into a single renderer instance.
+    """
     global renderers
     if len(files) == 1:
         path = Path(files[0])
