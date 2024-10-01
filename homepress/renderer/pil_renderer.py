@@ -1,5 +1,5 @@
 from .renderer_abc import Renderer
-from ..pages import clip
+from ..layout.pages import clip
 import PIL.Image
 from PIL.Image import Image
 from pathlib import Path
@@ -22,7 +22,10 @@ class PILRenderer(Renderer):
     def __len__(self) -> int:
         return 1
 
-    def render(self, page, size) -> bytes:
+    def render(self, page, size) -> Pixmap:
+        """
+        Converts the given input image to a Pixmap based on the size.
+        """
         im = PIL.Image.open(self.file).convert("RGBA")
 
         clipped_size = clip(im.size, size)
@@ -31,6 +34,10 @@ class PILRenderer(Renderer):
         
         return _pil_to_pixmap(im)
     
-    def render_preview(self, page) -> bytes:
-        return self.render(page, size=(1600, 1600))
+    def render_preview(self, page) -> Pixmap:
+        """
+        Scale down the image to a max of 420 in either dimensions and returns the
+        pixmap after doing that
+        """
+        return self.render(page, size=(420, 420))
     
