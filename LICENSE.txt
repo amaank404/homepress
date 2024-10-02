@@ -1,6 +1,6 @@
 The MIT License (MIT)
 
-Copyright © Amaan Ahmad Khan 2023 
+Copyright © Amaan Ahmad Khan 2023
 
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
