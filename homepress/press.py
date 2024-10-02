@@ -4,7 +4,7 @@ import pymupdf
 
 from . import bindermath, progress
 from .layout import pages
-from .renderer import get_renderer
+from .renderer import PageRangeRenderer, Renderer, get_renderer
 
 
 def _flatten[T](l: list[list[T]]) -> list[T]:
@@ -14,9 +14,34 @@ def _flatten[T](l: list[list[T]]) -> list[T]:
     return temp
 
 
+def _set_defaults_and_check_unknown(
+    opts: dict, defaults: dict, ignore_prefix: tuple = ()
+):
+    for k, v in defaults.items():
+        opts.setdefault(k, v)
+
+    for x in opts:
+        skip = False
+        for y in ignore_prefix:
+            if x.startswith(y):
+                skip = True
+        if not skip:
+            if x not in defaults:
+                # Raise error if an unknown option is passed to the function
+                raise TypeError(f"Unrecognised options {x}")
+
+
 class Press:
-    def __init__(self, files: list[str, Path], ignore_errors=False) -> None:
+    """
+    A Press object to process input files in several different ways
+    """
+
+    def __init__(
+        self, files: list[str, Path] | Renderer, ignore_errors=False, pages=None
+    ) -> None:
         self.renderer = get_renderer(files, ignore_errors)
+        if pages is not None:
+            self.renderer = PageRangeRenderer(self.renderer, *pages)
 
     def midpage(self, output, **options) -> None:
         """
@@ -36,11 +61,15 @@ class Press:
     def progress_midpage(
         self, output, *, progress: progress.Progress = None, **options
     ) -> progress.Progress:
-        options.setdefault("size", "A4")
-        options.setdefault("margin", (0, 0, 0, 0))
-        options.setdefault("ppi", 200)
-        options.setdefault("rtl", False)
-        options.setdefault("flip_even", False)
+        defaults = {
+            "size": "A4",
+            "margin": (0, 0, 0, 0),
+            "ppi": 200,
+            "rtl": False,
+            "flip_even": False,
+        }
+
+        _set_defaults_and_check_unknown(options, defaults)
 
         # Get binded page order
         page_order = _flatten(
@@ -110,7 +139,9 @@ class Press:
                     clipped_size[0] + position_left,
                 )
 
-                page.insert_image(r, pixmap=top_page_pixmap, rotate=-90)
+                page.insert_image(
+                    r, pixmap=top_page_pixmap, rotate=-90 if not options["rtl"] else 90
+                )
 
                 progress.increment_progress()
 
@@ -136,16 +167,22 @@ class Press:
                     clipped_size[0] + position_left,
                 )
 
-                page.insert_image(r, pixmap=bottom_page_pixmap, rotate=-90)
+                page.insert_image(
+                    r,
+                    pixmap=bottom_page_pixmap,
+                    rotate=-90 if not options["rtl"] else 90,
+                )
 
                 progress.increment_progress()
 
         if options["flip_even"]:
+            progress.set_msg("Flipping even pages")
             for i, x in enumerate(new_file):
                 if i % 2 == 1:
                     x.set_rotation(180)
                     progress.increment_progress()
 
+        progress.set_msg("Saving output to PDF")
         new_file.ez_save(output)
 
     def merge(self, output, **options) -> None:
@@ -161,7 +198,9 @@ class Press:
     def progress_merge(
         self, output, *, progress: progress.Progress = None, **options
     ) -> progress.Progress:
-        options.setdefault("resolution", (1600, 1600))
+        defaults = {"resolution": (1600, 1600)}
+        _set_defaults_and_check_unknown(options, defaults)
+
         resolution = options["resolution"]
 
         new_file = pymupdf.Document()
@@ -175,6 +214,7 @@ class Press:
             page.insert_image((0, 0, pixmap.width, pixmap.height), pixmap=pixmap)
             progress.increment_progress()
 
+        progress.set_msg("Saving output")
         new_file.ez_save(output)
 
     def images(self, output, **options):
@@ -197,10 +237,18 @@ class Press:
         path = Path(output)
         path.mkdir(exist_ok=True)
 
-        file_prefix = options.setdefault("file_prefix", "")
-        resolution = options.setdefault("resolution", (1600, 1600))
-        format = options.setdefault("format", "png")
-        jpg_compression = options.setdefault("jpg_compression", 95)
+        defaults = {
+            "file_prefix": "",
+            "resolution": (1600, 1600),
+            "format": "png",
+            "jpg_compression": 95,
+        }
+        _set_defaults_and_check_unknown(options, defaults, ignore_prefix=("pil_",))
+
+        format = options["format"]
+        file_prefix = options["file_prefix"]
+        resolution = options["resolution"]
+        jpg_compression = options["jpg_compression"]
 
         # Some python-fu to select pil_ arguments and remove the pil_ prefix
         pil_params = dict(
@@ -211,7 +259,7 @@ class Press:
         )
 
         progress.set_total(len(self.renderer))
-        progress.set_msg("Rendering input files to Images")
+        progress.set_msg("Rendering input files to images")
 
         for x in range(len(self.renderer)):
             pixmap = self.renderer.render(page=x, size=resolution)

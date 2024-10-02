@@ -3,7 +3,9 @@ from pathlib import Path
 
 from .multi_renderer import MultiRenderer
 from .mupdf_renderer import MuPDFRenderer
+from .page_range_renderer import PageRangeRenderer
 from .pil_renderer import PILRenderer
+from .renderer_abc import Renderer
 
 # All the supported renderers
 renderers = [MuPDFRenderer, PILRenderer]
@@ -20,6 +22,10 @@ def get_renderer(files, ignore_errors=False):
     aggregates all the given files into a single renderer instance.
     """
     global renderers
+
+    if isinstance(files, Renderer):
+        return files
+
     if len(files) == 1:
         path = Path(files[0])
         if path.is_dir():
