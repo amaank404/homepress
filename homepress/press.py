@@ -1,14 +1,14 @@
 from pathlib import Path
 
+import pymupdf
+
+from . import bindermath, progress
 from .layout import pages
 from .renderer import get_renderer
-from . import progress
-import PIL
-import pymupdf
-import time
 
-class Press():
-    def __init__(self, files: list[str, Path], ignore_errors = False) -> None:
+
+class Press:
+    def __init__(self, files: list[str, Path], ignore_errors=False) -> None:
         self.renderer = get_renderer(files, ignore_errors)
 
     def midpage(self, **options):
@@ -16,20 +16,21 @@ class Press():
         options:
         size: str, tuple[float, float] - Page Size (name or ratio (h/w), width in inches)
         margin: tuple[top, outer, bottom, inner], give upto 4 parameters, default: all is 0
-        
+
         rtl: bool - Right to left
         flip_even: bool - Flip even pages horizontally by rotating them 180 degrees
         separate_even_odd: bool - Separate even and odd pages
         """
-        p_size = options['size']
+
+        # Get the page sizing
+        p_size = options["size"]
         if isinstance(p_size, str):
             p_size = pages.get_ratio_width(p_size)
 
         new_file = pymupdf.Document()
 
+        # Get a page size based on pdf standards involving 72 points per inch
         p_size = pages.get_pixels_from_ppi(*p_size)
-
-        # TODO
 
     def merge(self, output, **options) -> None:
         """
@@ -41,7 +42,9 @@ class Press():
         self.progress_merge(output, **options).sync()
 
     @progress.runs_with_progress
-    def progress_merge(self, output, *, progress: progress.Progress = None, **options) -> progress.Progress:
+    def progress_merge(
+        self, output, *, progress: progress.Progress = None, **options
+    ) -> progress.Progress:
         options.setdefault("resolution", (1600, 1600))
         resolution = options["resolution"]
 
@@ -56,7 +59,7 @@ class Press():
             progress.increment_progress()
 
         new_file.ez_save(output)
-    
+
     def images(self, output, **options):
         """
         output: output_folder
@@ -69,28 +72,39 @@ class Press():
         jpg_compression: int - defaulting to 95
         """
         self.progress_images(output, **options).sync()
-    
+
     @progress.runs_with_progress
-    def progress_images(self, output, *, progress: progress.Progress = None, **options) -> progress.Progress:
+    def progress_images(
+        self, output, *, progress: progress.Progress = None, **options
+    ) -> progress.Progress:
         path = Path(output)
         path.mkdir(exist_ok=True)
-        
+
         file_prefix = options.setdefault("file_prefix", "")
         resolution = options.setdefault("resolution", (1600, 1600))
         format = options.setdefault("format", "png")
         jpg_compression = options.setdefault("jpg_compression", 95)
 
         # Some python-fu to select pil_ arguments and remove the pil_ prefix
-        pil_params = dict(map(lambda x: (x[0].removeprefix("pil_"), x[1]), filter(lambda x: x[0].startswith("pil_"), options.items())))
+        pil_params = dict(
+            map(
+                lambda x: (x[0].removeprefix("pil_"), x[1]),
+                filter(lambda x: x[0].startswith("pil_"), options.items()),
+            )
+        )
 
         progress.set_total(len(self.renderer))
 
         for x in range(len(self.renderer)):
             pixmap = self.renderer.render(page=x, size=resolution)
             if format in ("png", "jpg"):
-                pixmap.save(path / f"{file_prefix}{x+1}.{format}", format, jpg_compression)
+                pixmap.save(
+                    path / f"{file_prefix}{x+1}.{format}", format, jpg_compression
+                )
             else:
-                pixmap.pil_save(path / f"{file_prefix}{x+1}.{format}", format, **pil_params)
+                pixmap.pil_save(
+                    path / f"{file_prefix}{x+1}.{format}", format, **pil_params
+                )
 
             progress.increment_progress()
 
@@ -112,4 +126,3 @@ class Press():
             progress.increment_progress()
 
         return all_txt
-    

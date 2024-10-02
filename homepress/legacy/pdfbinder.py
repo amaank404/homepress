@@ -19,14 +19,26 @@ instead of binding the whole book at once. (This is used for binding/printing
 thick books sometimes)
 """
 
-import pypdf
-from .. import bindermath
-from tqdm import tqdm
 import os
-from typing import Union, Tuple
 from copy import deepcopy
+from typing import Tuple, Union
 
-def multi_stack_midpage(inputfile: str, outputfile: Union[str, Tuple[str, str]], flip_even: bool = False, right_to_left: bool = False, separate_even_odd_output: bool = False, progressbar: bool = True, separate_stacks: bool = False, stack_size: int = 40):
+import pypdf
+from tqdm import tqdm
+
+from .. import bindermath
+
+
+def multi_stack_midpage(
+    inputfile: str,
+    outputfile: Union[str, Tuple[str, str]],
+    flip_even: bool = False,
+    right_to_left: bool = False,
+    separate_even_odd_output: bool = False,
+    progressbar: bool = True,
+    separate_stacks: bool = False,
+    stack_size: int = 40,
+):
     """
     Takes an input PDF file and outputs it. The output parameter is either a single path to a file/folder or
     2 paths to files/folders enclosed within a tuple. The 2 paths case is when you wish to separate even and odd
@@ -36,7 +48,7 @@ def multi_stack_midpage(inputfile: str, outputfile: Union[str, Tuple[str, str]],
     pages flipped horizontally. It is recommended to enable this in case you are printing using a printer
     that supports double side printing without needing manual flipping of pages. If you are using a single
     side printer, it is recommended that you leave this off. When printing using a single sided printer,
-    print the odd pages first, after that. Flip the pages at the horizontal axis. 
+    print the odd pages first, after that. Flip the pages at the horizontal axis.
 
     right_to_left parameter is a boolean value. By default, False. For certain languages and countries it is
     more conventional for the print to be right to left instead of the more popular left to right. Medias like
@@ -60,11 +72,11 @@ def multi_stack_midpage(inputfile: str, outputfile: Union[str, Tuple[str, str]],
     """
     if stack_size % 4 != 0:
         raise ValueError("Stack size must be a multiple of 4. ie stack_size % 4 == 0")
-    
+
     reader = pypdf.PdfReader(inputfile)
     decided_stack_ranges = []
-    num_stacks = len(reader.pages)//stack_size
-    extra_pages = len(reader.pages)%stack_size
+    num_stacks = len(reader.pages) // stack_size
+    extra_pages = len(reader.pages) % stack_size
     total_naming_digits = len(str(num_stacks))
 
     print(f"Total Stacks: {num_stacks}")
@@ -72,28 +84,25 @@ def multi_stack_midpage(inputfile: str, outputfile: Union[str, Tuple[str, str]],
     cur_st = 0
     for x in range(num_stacks):
         if extra_pages > 0:
-            decided_stack_ranges.append((cur_st, cur_st+stack_size+ 4))
+            decided_stack_ranges.append((cur_st, cur_st + stack_size + 4))
             extra_pages -= 4
-            cur_st += stack_size+4
+            cur_st += stack_size + 4
         else:
-            decided_stack_ranges.append((cur_st, cur_st+stack_size))
+            decided_stack_ranges.append((cur_st, cur_st + stack_size))
             cur_st += stack_size
 
     # Precalculate dimensions per page
     dimensions = []
     for i, x in enumerate(reader.pages):
-        dimensions.append((i,
-            x.cropbox.width *
-            x.cropbox.height
-        ))
+        dimensions.append((i, x.cropbox.width * x.cropbox.height))
     dimensions.sort(key=lambda x: x[1])
-    pid = dimensions[len(dimensions)//2][0]
+    pid = dimensions[len(dimensions) // 2][0]
     del dimensions
 
     # Get the median page individual dimensions
     medpagedims = deepcopy(reader.pages[pid].cropbox)
-    perpagedimensions = (medpagedims.height, medpagedims.width*2)
-    
+    perpagedimensions = (medpagedims.height, medpagedims.width * 2)
+
     if not separate_stacks:
         if separate_even_odd_output:
             writer_odd = pypdf.PdfWriter()
@@ -107,36 +116,76 @@ def multi_stack_midpage(inputfile: str, outputfile: Union[str, Tuple[str, str]],
         else:
             os.makedirs(outputfile, exist_ok=True)
 
-
     for current_stack, current_stack_range in enumerate(decided_stack_ranges):
         if progressbar:
-            print("\nProcessing Stack: ", current_stack+1)
-        output = single_stack_midpage(inputfile=reader, outputfile=None, flip_even=flip_even, right_to_left=right_to_left, single_sided=False, separate_even_odd_output=separate_even_odd_output, progressbar=progressbar, input_page_range=current_stack_range, _dinput=True, _doutput=True, _predims=perpagedimensions, _prerectobj=medpagedims)
+            print("\nProcessing Stack: ", current_stack + 1)
+        output = single_stack_midpage(
+            inputfile=reader,
+            outputfile=None,
+            flip_even=flip_even,
+            right_to_left=right_to_left,
+            single_sided=False,
+            separate_even_odd_output=separate_even_odd_output,
+            progressbar=progressbar,
+            input_page_range=current_stack_range,
+            _dinput=True,
+            _doutput=True,
+            _predims=perpagedimensions,
+            _prerectobj=medpagedims,
+        )
         if separate_stacks:
             if separate_even_odd_output:
-                output[0].write(os.path.join(outputfile[0], f"stack_{str(current_stack+1).rjust(total_naming_digits, '0')}.pdf"))
-                output[1].write(os.path.join(outputfile[1], f"stack_{str(current_stack+1).rjust(total_naming_digits, '0')}.pdf"))
+                output[0].write(
+                    os.path.join(
+                        outputfile[0],
+                        f"stack_{str(current_stack+1).rjust(total_naming_digits, '0')}.pdf",
+                    )
+                )
+                output[1].write(
+                    os.path.join(
+                        outputfile[1],
+                        f"stack_{str(current_stack+1).rjust(total_naming_digits, '0')}.pdf",
+                    )
+                )
             else:
-                output.write(os.path.join(outputfile, f"stack_{str(current_stack+1).rjust(total_naming_digits, '0')}.pdf"))
+                output.write(
+                    os.path.join(
+                        outputfile,
+                        f"stack_{str(current_stack+1).rjust(total_naming_digits, '0')}.pdf",
+                    )
+                )
         else:
             if separate_even_odd_output:
-                for page in output[0].pages: # Odd
+                for page in output[0].pages:  # Odd
                     writer_odd.add_page(page)
-                for page in output[1].pages: # Even
+                for page in output[1].pages:  # Even
                     writer_even.add_page(page)
             else:
                 for page in output.pages:
                     writer.add_page(page)
-    
+
     if not separate_stacks:
         if separate_even_odd_output:
             writer_odd.write(outputfile[0])
             writer_even.write(outputfile[1])
         else:
-            writer.write(outputfile)       
+            writer.write(outputfile)
 
 
-def single_stack_midpage(inputfile: str, outputfile: Union[str, Tuple[str, str]], flip_even: bool = False, right_to_left: bool = False, single_sided: bool = False, separate_even_odd_output: bool = False, progressbar: bool = True, input_page_range: Tuple[int, int] = None, _dinput=False, _doutput=False, _predims=None, _prerectobj=None):
+def single_stack_midpage(
+    inputfile: str,
+    outputfile: Union[str, Tuple[str, str]],
+    flip_even: bool = False,
+    right_to_left: bool = False,
+    single_sided: bool = False,
+    separate_even_odd_output: bool = False,
+    progressbar: bool = True,
+    input_page_range: Tuple[int, int] = None,
+    _dinput=False,
+    _doutput=False,
+    _predims=None,
+    _prerectobj=None,
+):
     """
     Takes an input PDF file and outputs it. The output parameter is either a single path (a string object) or
     2 paths enclosed within a tuple. the 2 paths case is when you wish to separate even and odd outputs.
@@ -145,7 +194,7 @@ def single_stack_midpage(inputfile: str, outputfile: Union[str, Tuple[str, str]]
     pages flipped horizontally. It is recommended to enable this in case you are printing using a printer
     that supports double side printing without needing manual flipping of pages. If you are using a single
     side printer, it is recommended that you leave this off. When printing using a single sided printer,
-    print the odd pages first, after that. Flip the pages at the horizontal axis. 
+    print the odd pages first, after that. Flip the pages at the horizontal axis.
 
     right_to_left parameter is a boolean value. By default, False. For certain languages and countries it is
     more conventional for the print to be right to left instead of the more popular left to right. Medias like
@@ -172,10 +221,12 @@ def single_stack_midpage(inputfile: str, outputfile: Union[str, Tuple[str, str]]
     also for developers: you may use the flags: _dinput/_doutput for direct input output of pypdf objects. _dinput
     takes the reader instance from inputfile parameter directly. _doutput only returns the values, _doutput would
     completely ignore paths provided in the outputfile parameter. _predims,_prerectobj should not be used by external developers.
-    do note that this function modifies input pdf object, MODIFIES OBJECT, not source file. 
+    do note that this function modifies input pdf object, MODIFIES OBJECT, not source file.
     """
     if separate_even_odd_output and not isinstance(outputfile, tuple) and not _dinput:
-        raise TypeError(f"Given output parameter is of wrong type, two paths are required. Given parameter value: {repr(outputfile)}")
+        raise TypeError(
+            f"Given output parameter is of wrong type, two paths are required. Given parameter value: {repr(outputfile)}"
+        )
 
     if not _dinput:
         reader = pypdf.PdfReader(inputfile)
@@ -183,26 +234,22 @@ def single_stack_midpage(inputfile: str, outputfile: Union[str, Tuple[str, str]]
         reader = inputfile
     writer = pypdf.PdfWriter()
     totalpages = len(reader.pages)
-    
+
     # Get median page sorted by size
     if _predims is None:
         dimensions = []
         for i, x in enumerate(reader.pages):
-            dimensions.append((i,
-                x.cropbox.width *
-                x.cropbox.height
-            ))
+            dimensions.append((i, x.cropbox.width * x.cropbox.height))
         dimensions.sort(key=lambda x: x[1])
-        pid = dimensions[len(dimensions)//2][0]
+        pid = dimensions[len(dimensions) // 2][0]
         del dimensions
 
         # Get the median page individual dimensions
         medpagedims = reader.pages[pid].cropbox
-        perpagedimensions = (medpagedims.height, medpagedims.width*2)
+        perpagedimensions = (medpagedims.height, medpagedims.width * 2)
     else:
         medpagedims = _prerectobj
         perpagedimensions = _predims
-
 
     # Start the output binding process
     if not single_sided:
@@ -220,8 +267,8 @@ def single_stack_midpage(inputfile: str, outputfile: Union[str, Tuple[str, str]]
             if input_page_range is None:
                 pageorderflattened.extend(x)
             else:  # Offset the page numbers to meet start
-                _p1 = [x[0][0]+_start, x[0][1]+_start]
-                _p2 = [x[1][0]+_start, x[1][1]+_start]
+                _p1 = [x[0][0] + _start, x[0][1] + _start]
+                _p2 = [x[1][0] + _start, x[1][1] + _start]
 
                 # This weird looking thing below makes sure that the pages are overflowed so that they are not in output if the said page exceeds end limits
                 if _p1[0] >= _end:
@@ -241,19 +288,23 @@ def single_stack_midpage(inputfile: str, outputfile: Union[str, Tuple[str, str]]
         else:
             iterobj = pageorderflattened
 
-        for (pagetop, pagebottom) in iterobj:
+        for pagetop, pagebottom in iterobj:
             writer.add_blank_page(perpagedimensions[0], perpagedimensions[1])
             if pagetop < totalpages:
                 paget = reader.pages[pagetop]
                 paget = paget.rotate(90 if not right_to_left else 270)
                 paget.transfer_rotation_to_content()
-                writer.pages[-1].merge_translated_page(paget, -medpagedims.bottom, medpagedims.width-medpagedims.left)
+                writer.pages[-1].merge_translated_page(
+                    paget, -medpagedims.bottom, medpagedims.width - medpagedims.left
+                )
             if pagebottom < totalpages:
                 pageb = reader.pages[pagebottom]
                 pageb = pageb.rotate(90 if not right_to_left else 270)
                 pageb.transfer_rotation_to_content()
-                writer.pages[-1].merge_translated_page(pageb, -medpagedims.bottom, -medpagedims.left)
-        
+                writer.pages[-1].merge_translated_page(
+                    pageb, -medpagedims.bottom, -medpagedims.left
+                )
+
         if flip_even:
             if progressbar:
                 iterobj = tqdm(range(len(writer.pages)))
@@ -289,24 +340,28 @@ def single_stack_midpage(inputfile: str, outputfile: Union[str, Tuple[str, str]]
                 writer.write(outputfile)
     else:
         pageorderflattened = bindermath.singleside_singlestack_midpage(totalpages)
-        
+
         if progressbar:
             iterobj = tqdm(pageorderflattened)
         else:
             iterobj = pageorderflattened
-        
-        for (pagetop, pagebottom) in iterobj:
+
+        for pagetop, pagebottom in iterobj:
             writer.add_blank_page(perpagedimensions[0], perpagedimensions[1])
             if pagetop < totalpages:
                 paget = reader.pages[pagetop]
                 paget = paget.rotate(90 if not right_to_left else 270)
                 paget.transfer_rotation_to_content()
-                writer.pages[-1].merge_translated_page(paget, -medpagedims.bottom, medpagedims.width-medpagedims.left)
+                writer.pages[-1].merge_translated_page(
+                    paget, -medpagedims.bottom, medpagedims.width - medpagedims.left
+                )
             if pagebottom < totalpages:
                 pageb = reader.pages[pagebottom]
                 pageb = pageb.rotate(90 if not right_to_left else 270)
                 pageb.transfer_rotation_to_content()
-                writer.pages[-1].merge_translated_page(pageb, -medpagedims.bottom, -medpagedims.left)
+                writer.pages[-1].merge_translated_page(
+                    pageb, -medpagedims.bottom, -medpagedims.left
+                )
 
         if _doutput:
             return writer

@@ -1,7 +1,8 @@
 import threading
 import time
 
-class Progress():
+
+class Progress:
     """
     A live progress tracker for live progress functions. If a function returns this object
     then you may use it to get progress updates!
@@ -28,7 +29,14 @@ class Progress():
     progress.sync()
     ```
     """
-    def __init__(self, total: int = 1, progress: int = 0, msg: str = "", callback: callable = None) -> None:
+
+    def __init__(
+        self,
+        total: int = 1,
+        progress: int = 0,
+        msg: str = "",
+        callback: callable = None,
+    ) -> None:
         self.total = total
         self.progress = progress
         self.msg = msg
@@ -81,7 +89,7 @@ class Progress():
         """
         with self._lock:
             self.msg = msg
-    
+
     def fail(self, e):
         """
         Function Method (Not to be used, errors raised are automatically handled by decorator)
@@ -107,7 +115,7 @@ class Progress():
         """
         if self.failed:
             raise self.exception
-        
+
     def sync(self):
         """
         Synchronise the underlying function to the main thread. Blocks until the underlying
@@ -129,8 +137,8 @@ class Progress():
         """
         Get the percentage value for the current progress as a float rounded off to 3 decimals
         """
-        return round(100*self.progress/self.total, 3)
-    
+        return round(100 * self.progress / self.total, 3)
+
 
 def runs_with_progress(func):
     """
@@ -154,13 +162,15 @@ def runs_with_progress(func):
             print(x)
             progess.increment_progress()
         progress.set_msg("Finished")
-    
+
     progress = my_function(1, 2, 3)
     progress.sync()  # Or other functions from progress!
     ```
     """
+
     def progressed_function(*args, **kwargs):
         progress = Progress()
+
         def progress_failure_catch_func(*args, **kwargs):
             progress = kwargs["progress"]
             try:
@@ -168,10 +178,13 @@ def runs_with_progress(func):
                 progress.complete(result)
             except Exception as e:
                 progress.fail(e)
+
         kwargs["progress"] = progress
-        thread = threading.Thread(target=progress_failure_catch_func, args=args, kwargs=kwargs, daemon=True)
+        thread = threading.Thread(
+            target=progress_failure_catch_func, args=args, kwargs=kwargs, daemon=True
+        )
         thread.start()
         progress.thread = thread
         return progress
-    
+
     return progressed_function

@@ -8,7 +8,7 @@ This mimics how some books are printed.
 
 # Functionalities and Usage Instructions
 
-Homepress comes with different types of binding methods. 
+Homepress comes with different types of binding methods.
 
 ## midpage
 
@@ -33,7 +33,7 @@ it is similar to midpage binding. The difference being that the input document i
 command for this becomes:
 
 ```
-homepress {InputFile} midpage-multi [printing_options] {OutputFile} 
+homepress {InputFile} midpage-multi [printing_options] {OutputFile}
 ```
 
 # Printing Options

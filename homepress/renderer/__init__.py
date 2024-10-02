@@ -1,8 +1,9 @@
+import logging
+from pathlib import Path
+
+from .multi_renderer import MultiRenderer
 from .mupdf_renderer import MuPDFRenderer
 from .pil_renderer import PILRenderer
-from .multi_renderer import MultiRenderer
-from pathlib import Path
-import logging
 
 # All the supported renderers
 renderers = [MuPDFRenderer, PILRenderer]
@@ -11,6 +12,7 @@ renderers = [MuPDFRenderer, PILRenderer]
 formats = set()
 for x in renderers:
     formats.update(x.supported_extensions)
+
 
 def get_renderer(files, ignore_errors=False):
     """
@@ -21,7 +23,9 @@ def get_renderer(files, ignore_errors=False):
     if len(files) == 1:
         path = Path(files[0])
         if path.is_dir():
-            return get_renderer(sorted(list(path.iterdir()), key=lambda x: x.name), ignore_errors)
+            return get_renderer(
+                sorted(list(path.iterdir()), key=lambda x: x.name), ignore_errors
+            )
         elif path.is_file():
             ext = path.suffix.strip(".")
             if ext in formats:
@@ -29,7 +33,7 @@ def get_renderer(files, ignore_errors=False):
                     if ext in x.supported_extensions:
                         return x(files[0])
         raise TypeError("File format not supported")
-    
+
     else:
         render = []
         for x in files:
@@ -40,5 +44,5 @@ def get_renderer(files, ignore_errors=False):
                     logging.warning(f"ignored: {e}")
                 else:
                     raise e
-        
+
         return MultiRenderer(render)
