@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "homepress"
-version = "0.3.1"
+version = "2.0.0"
 description = "An All in One Home based book printing software solution. Can be used as a library."
 authors = ["Amaan Ahmad Khan"]
 license = "MIT License"

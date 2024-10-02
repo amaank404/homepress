@@ -1,7 +1,9 @@
 from pymupdf import Pixmap
 
-class Renderer():
+
+class Renderer:
     supported_extensions = []
+
     def __init__(self, file) -> None:
         pass
 
@@ -10,7 +12,7 @@ class Renderer():
 
     def render_preview(self, page) -> Pixmap:
         return b""
-    
+
     def get_text(self, page) -> str:
         return ""
 
@@ -19,4 +21,3 @@ class Renderer():
         Page count
         """
         return 0
-    
