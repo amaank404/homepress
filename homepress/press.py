@@ -7,30 +7,146 @@ from .layout import pages
 from .renderer import get_renderer
 
 
+def _flatten[T](l: list[list[T]]) -> list[T]:
+    temp = []
+    for x in l:
+        temp.extend(x)
+    return temp
+
+
 class Press:
     def __init__(self, files: list[str, Path], ignore_errors=False) -> None:
         self.renderer = get_renderer(files, ignore_errors)
 
-    def midpage(self, **options):
+    def midpage(self, output, **options) -> None:
         """
+        output: str, io_stream, tuple(str | io_stream, str | io_stream) - output pdf file path (should contain suffix .pdf)
+
         options:
         size: str, tuple[float, float] - Page Size (name or ratio (h/w), width in inches)
         margin: tuple[top, outer, bottom, inner], give upto 4 parameters, default: all is 0
+        ppi: int - Pixels per inch (default: 200)
 
         rtl: bool - Right to left
         flip_even: bool - Flip even pages horizontally by rotating them 180 degrees
-        separate_even_odd: bool - Separate even and odd pages
         """
+        self.progress_midpage(output, **options).sync()
+
+    @progress.runs_with_progress
+    def progress_midpage(
+        self, output, *, progress: progress.Progress = None, **options
+    ) -> progress.Progress:
+        options.setdefault("size", "A4")
+        options.setdefault("margin", (0, 0, 0, 0))
+        options.setdefault("ppi", 200)
+        options.setdefault("rtl", False)
+        options.setdefault("flip_even", False)
+
+        # Get binded page order
+        page_order = _flatten(
+            bindermath.doubleside_singlestack_midpage(len(self.renderer))
+        )
+
+        total_pages = len(self.renderer)
+
+        progress.set_total(
+            len(self.renderer) + (len(page_order) // 2 if options["flip_even"] else 0)
+        )
+        progress.set_msg("Rendering input files to midpage binded PDF")
+
+        # Setup margins
+        margin = options["margin"]
+        if len(margin) == 1:  # In case only one argument is provided
+            margin.append(margin[0])
+        if len(margin) == 2:  # In case 2 arguments are provided
+            margin.append(margin[0])
+        if len(margin) == 3:  # In case 3 arguments are provided
+            margin.append(margin[1])
 
         # Get the page sizing
         p_size = options["size"]
         if isinstance(p_size, str):
             p_size = pages.get_ratio_width(p_size)
 
-        new_file = pymupdf.Document()
-
         # Get a page size based on pdf standards involving 72 points per inch
         p_size = pages.get_pixels_from_ppi(*p_size)
+        half_page_size = (p_size[1] / 2, p_size[0])
+
+        working_space_half_page = (  # Image rendering size in 72ppi
+            half_page_size[0] - margin[1] - margin[3],
+            half_page_size[1] - margin[0] - margin[2],
+        )
+
+        ppi_scale_factor = options["ppi"] / 72
+
+        working_space_half_page_ppi_scaled = (
+            working_space_half_page[0] * ppi_scale_factor,
+            working_space_half_page[1] * ppi_scale_factor,
+        )
+
+        new_file = pymupdf.Document()
+
+        for top_page, bottom_page in page_order:
+            page = new_file.new_page(width=p_size[0], height=p_size[1])
+
+            if top_page < total_pages:
+
+                top_page_pixmap = self.renderer.render(
+                    top_page, working_space_half_page_ppi_scaled
+                )
+
+                # I have no clue how I wrote this, but it works, so don't mess with this
+                size = (top_page_pixmap.w, top_page_pixmap.h)
+                clipped_size = pages.clip(size, working_space_half_page)
+                position_left = (
+                    margin[1] + (working_space_half_page[0] - clipped_size[0]) / 2
+                )
+                position_bottom = (
+                    margin[2] + (working_space_half_page[1] - clipped_size[1]) / 2
+                )
+                r = (position_bottom, position_left)
+                r += (
+                    clipped_size[1] + position_bottom,
+                    clipped_size[0] + position_left,
+                )
+
+                page.insert_image(r, pixmap=top_page_pixmap, rotate=-90)
+
+                progress.increment_progress()
+
+            if bottom_page < total_pages:
+                bottom_page_pixmap = self.renderer.render(
+                    bottom_page, working_space_half_page_ppi_scaled
+                )
+
+                # I have no clue how I wrote this, but it works, so don't mess with this
+                size = (bottom_page_pixmap.w, bottom_page_pixmap.h)
+                clipped_size = pages.clip(size, working_space_half_page)
+                position_left = (
+                    half_page_size[0]
+                    + margin[3]
+                    + (working_space_half_page[0] - clipped_size[0]) / 2
+                )
+                position_bottom = (
+                    margin[2] + (working_space_half_page[1] - clipped_size[1]) / 2
+                )
+                r = (position_bottom, position_left)
+                r += (
+                    clipped_size[1] + position_bottom,
+                    clipped_size[0] + position_left,
+                )
+
+                page.insert_image(r, pixmap=bottom_page_pixmap, rotate=-90)
+
+                progress.increment_progress()
+
+        if options["flip_even"]:
+            for i, x in enumerate(new_file):
+                if i % 2 == 1:
+                    x.set_rotation(180)
+                    progress.increment_progress()
+
+        new_file.ez_save(output)
 
     def merge(self, output, **options) -> None:
         """
@@ -50,6 +166,7 @@ class Press:
 
         new_file = pymupdf.Document()
         progress.set_total(len(self.renderer))
+        progress.set_msg("Rendering and Merging input files to PDF")
 
         for x in range(len(self.renderer)):
             pixmap = self.renderer.render(page=x, size=resolution)
@@ -94,6 +211,7 @@ class Press:
         )
 
         progress.set_total(len(self.renderer))
+        progress.set_msg("Rendering input files to Images")
 
         for x in range(len(self.renderer)):
             pixmap = self.renderer.render(page=x, size=resolution)
@@ -118,6 +236,7 @@ class Press:
     @progress.runs_with_progress
     def progress_text(self, *, progress: progress.Progress = None) -> progress.Progress:
         progress.set_total(len(self.renderer))
+        progress.set_msg("Extracting text from given input files")
         all_txt = []
 
         for x in range(len(self.renderer)):

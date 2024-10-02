@@ -1,3 +1,5 @@
+import pymupdf
+
 from .renderer_abc import Renderer
 
 
@@ -21,11 +23,11 @@ class MultiRenderer(Renderer):
             idx -= x
         raise IndexError(f"Page out of range: {pageno}/{len(self)}")
 
-    def render(self, page, size) -> bytes:
+    def render(self, page, size) -> pymupdf.Pixmap:
         r, p = self._localise_pageno(page)
         return r.render(p, size)
 
-    def render_preview(self, page) -> bytes:
+    def render_preview(self, page) -> pymupdf.Pixmap:
         r, p = self._localise_pageno(page)
         return r.render_preview(p)
 
