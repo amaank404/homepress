@@ -27,6 +27,9 @@ def get_pixels_from_ppi(ratio, width: float, ppi: float = 72):
 
 
 def clip(page, box):
+    """
+    Clip a page to given box
+    """
     # If page height is dimensionally greater than box height,
     # clip wrt to height
     if page[1] / page[0] >= box[1] / box[0]:
