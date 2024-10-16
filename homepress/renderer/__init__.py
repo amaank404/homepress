@@ -7,6 +7,8 @@ from .page_range_renderer import PageRangeRenderer
 from .pil_renderer import PILRenderer
 from .renderer_abc import Renderer
 
+__all__ = ["get_renderer", "MultiRenderer", "PageRangeRenderer", "Renderer"]
+
 # All the supported renderers
 renderers = [MuPDFRenderer, PILRenderer]
 
@@ -38,7 +40,7 @@ def get_renderer(files, ignore_errors=False):
                 for x in renderers:
                     if ext in x.supported_extensions:
                         return x(files[0])
-        raise TypeError("File format not supported")
+        raise TypeError(f"File format not supported for {path}")
 
     else:
         render = []

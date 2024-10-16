@@ -11,7 +11,17 @@ class MuPDFRenderer(Renderer):
     supports several extensions including pdf, epub, cbz, cbr, fb2
     """
 
-    supported_extensions = ["pdf", "epub", "cbz", "cbr", "fb2"]
+    supported_extensions = [
+        "pdf",
+        "epub",
+        "cbz",
+        "cbr",
+        "fb2",
+        "xps",
+        "mobi",
+        "svg",
+        "txt",
+    ]
 
     def __init__(self, file) -> None:
         self.fp = pymupdf.open(file)

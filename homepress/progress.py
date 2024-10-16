@@ -125,6 +125,27 @@ class Progress:
         self.check_fail()
         return self.result
 
+    def sync_with_progress_bar(self, poll_delay=0.1):
+        """
+        Synchronise the underlying function to the main thread while also displaying the
+        progress to the standard output. Blocks until the underlying function has finished
+        completion. A default poll_delay, updates between status update is set to 0.1 seconds
+        """
+        previous_msg_len = 0  # To pad extra characters
+        condition = True
+        while condition:
+            self.check_fail()
+
+            condition = not self.completed
+
+            t = f"{self.progress}/{self.total} {self.percent}% {self.msg}"
+            print("\r" + t.ljust(previous_msg_len), end="", flush=True)
+            previous_msg_len = len(t)
+
+            time.sleep(poll_delay)
+        print()
+        return self.sync()
+
     @property
     def completed(self):
         """

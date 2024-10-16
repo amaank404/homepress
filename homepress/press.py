@@ -1,9 +1,12 @@
+import io
+import shutil
 from pathlib import Path
 
 import pymupdf
 
 from . import bindermath, progress
 from .layout import pages
+from .progress import Progress
 from .renderer import PageRangeRenderer, Renderer, get_renderer
 
 
@@ -34,6 +37,9 @@ def _set_defaults_and_check_unknown(
 class Press:
     """
     A Press object to process input files in several different ways
+
+    ignore_errors: bool - ignore errors while reading the input files
+    pages: None -
     """
 
     def __init__(
@@ -43,12 +49,122 @@ class Press:
         if pages is not None:
             self.renderer = PageRangeRenderer(self.renderer, *pages)
 
-    def midpage(self, output, **options) -> None:
+    def midpage_multi(self, output, **options) -> None:
         """
-        output: str, io_stream, tuple(str | io_stream, str | io_stream) - output pdf file path (should contain suffix .pdf)
+        output: str, io_stream, folder_path - output pdf file path (should contain suffix .pdf)
 
         options:
-        size: str, tuple[float, float] - Page Size (name or ratio (h/w), width in inches)
+        size: str, tuple[float, float] - Page Size (name or ratio (w/h), width in inches)
+        margin: tuple[top, outer, bottom, inner], give upto 4 parameters, default: all is 0
+        ppi: int - Pixels per inch (default: 200)
+
+        rtl: bool - Right to left
+        flip_even: bool - Flip even pages horizontally by rotating them 180 degrees
+        separate_stacks: bool - Separates the stacks into multiple pdf files, (default False)
+            if true, provide a folder to the output parameter instead.
+        stack_prefix: str - Prefix for stack pdfs, (default "stack_")
+        stack_size: int - Size of an individual stack, this can't be guarenteed, A variation
+            of +1 may be observed to prevent creation of an unnecessarily small stack,
+            stack size must be a multiple of 4 (default: 40)
+        """
+        self.progress_midpage_multi(output, **options).sync()
+
+    @progress.runs_with_progress
+    def progress_midpage_multi(
+        self, output, *, progress: Progress = None, **options
+    ) -> Progress:
+        defaults = {
+            "size": "A4",
+            "margin": (0, 0, 0, 0),
+            "ppi": 200,
+            "rtl": False,
+            "flip_even": False,
+            "separate_stacks": False,
+            "stack_prefix": "stack_",
+            "stack_size": 40,
+        }
+
+        _set_defaults_and_check_unknown(options, defaults)
+
+        if options["separate_stacks"]:
+            Path(output).mkdir(parents=True, exist_ok=True)
+
+        # Distribute the pages into stack ranges, also eliminating a last small stack
+        decided_stack_ranges = []
+        total_pages = len(self.renderer)
+        progress.set_total(total_pages)
+        progress.set_msg("Calculating stack sizes")
+        stack_size = options["stack_size"]
+
+        num_stacks = total_pages // stack_size
+        extra_pages = total_pages % stack_size
+        total_naming_digits = len(str(num_stacks))
+
+        cur_st = 0
+        for _ in range(num_stacks):
+            if extra_pages > 0:
+                decided_stack_ranges.append((cur_st, cur_st + stack_size + 4))
+                extra_pages -= 4
+                cur_st += stack_size + 4
+            else:
+                decided_stack_ranges.append((cur_st, cur_st + stack_size))
+                cur_st += stack_size
+
+        prev_progress = 0
+        output_streams = (
+            []
+        )  # Used to save pdf results in memory if the pdf needs to be mergeed at the end
+
+        for current_stack, current_stack_range in enumerate(decided_stack_ranges):
+            progress.set_msg(f"Rendering stack {current_stack+1}")
+            output_stream = io.BytesIO()
+            press = Press(self.renderer, pages=range(*current_stack_range))
+            progress_object = press.progress_midpage(
+                output_stream,
+                size=options["size"],
+                margin=options["margin"],
+                ppi=options["ppi"],
+                rtl=options["rtl"],
+                flip_even=options["flip_even"],
+            )
+
+            while not progress_object.completed:
+                progress_object.check_fail()
+                progress.set_progress(prev_progress + progress_object.progress)
+
+            if options["separate_stacks"]:
+                output_stream.seek(0)
+                with open(
+                    Path(output)
+                    / (
+                        options["stack_prefix"]
+                        + str(current_stack + 1).rjust(total_naming_digits, "0")
+                        + ".pdf"
+                    ),
+                    "wb",
+                ) as fp:
+                    shutil.copyfileobj(output_stream, fp)
+                del output_stream  # To free up memory
+            else:
+                output_streams.append(output_stream)
+
+            prev_progress += progress_object.progress
+
+        if not options["separate_stacks"]:
+            progress.set_msg("Merging stacks into one document")
+            new_pdf = pymupdf.Document()
+            for i, x in enumerate(output_streams):
+                x.seek(0)
+                new_pdf.insert_pdf(pymupdf.Document(stream=x, filetype="pdf"))
+                del output_streams[i]
+            new_pdf.ez_save(output)
+
+    def midpage(self, output, **options) -> None:
+        """
+        output: str, io_stream - output pdf file path (should contain suffix .pdf)
+
+        options:
+        size: str, tuple[float, float] - Page Size (name or ratio (w/h), width in inches)
         margin: tuple[top, outer, bottom, inner], give upto 4 parameters, default: all is 0
         ppi: int - Pixels per inch (default: 200)
 
@@ -59,8 +175,8 @@ class Press:
 
     @progress.runs_with_progress
     def progress_midpage(
-        self, output, *, progress: progress.Progress = None, **options
-    ) -> progress.Progress:
+        self, output, *, progress: Progress = None, **options
+    ) -> Progress:
         defaults = {
             "size": "A4",
             "margin": (0, 0, 0, 0),
@@ -84,7 +200,7 @@ class Press:
         progress.set_msg("Rendering input files to midpage binded PDF")
 
         # Setup margins
-        margin = options["margin"]
+        margin = list(options["margin"])
         if len(margin) == 1:  # In case only one argument is provided
             margin.append(margin[0])
         if len(margin) == 2:  # In case 2 arguments are provided
@@ -196,8 +312,8 @@ class Press:
 
     @progress.runs_with_progress
     def progress_merge(
-        self, output, *, progress: progress.Progress = None, **options
-    ) -> progress.Progress:
+        self, output, *, progress: Progress = None, **options
+    ) -> Progress:
         defaults = {"resolution": (1600, 1600)}
         _set_defaults_and_check_unknown(options, defaults)
 
@@ -226,14 +342,13 @@ class Press:
         resolution: (w, h) - Max resolution in either dimension
         format: str - "png", "jpg", other formats are saved using pil (default: png)
         pil_*: options to pass to PIL saver
-        jpg_compression: int - defaulting to 95
         """
         self.progress_images(output, **options).sync()
 
     @progress.runs_with_progress
     def progress_images(
-        self, output, *, progress: progress.Progress = None, **options
-    ) -> progress.Progress:
+        self, output, *, progress: Progress = None, **options
+    ) -> Progress:
         path = Path(output)
         path.mkdir(exist_ok=True)
 
@@ -241,14 +356,12 @@ class Press:
             "file_prefix": "",
             "resolution": (1600, 1600),
             "format": "png",
-            "jpg_compression": 95,
         }
         _set_defaults_and_check_unknown(options, defaults, ignore_prefix=("pil_",))
 
         format = options["format"]
         file_prefix = options["file_prefix"]
         resolution = options["resolution"]
-        jpg_compression = options["jpg_compression"]
 
         # Some python-fu to select pil_ arguments and remove the pil_ prefix
         pil_params = dict(
@@ -263,10 +376,8 @@ class Press:
 
         for x in range(len(self.renderer)):
             pixmap = self.renderer.render(page=x, size=resolution)
-            if format in ("png", "jpg"):
-                pixmap.save(
-                    path / f"{file_prefix}{x+1}.{format}", format, jpg_compression
-                )
+            if format in ("png",):
+                pixmap.save(path / f"{file_prefix}{x+1}.{format}", format)
             else:
                 pixmap.pil_save(
                     path / f"{file_prefix}{x+1}.{format}", format, **pil_params
@@ -277,12 +388,12 @@ class Press:
     def text(self) -> list[str]:
         """
         Extracts text from given files (Some file formats may not support this feature) and
-        returns it as a list of strings. the index in the string corresponds to page.
+        returns it as a list of strings. the index in the returned list corresponds to page.
         """
         return self.progress_text().sync()
 
     @progress.runs_with_progress
-    def progress_text(self, *, progress: progress.Progress = None) -> progress.Progress:
+    def progress_text(self, *, progress: Progress = None) -> Progress:
         progress.set_total(len(self.renderer))
         progress.set_msg("Extracting text from given input files")
         all_txt = []

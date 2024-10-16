@@ -1,8 +1,8 @@
 ratios = {
-    "A4": 2**0.5,  # Also applicable for other series
-    "Letter": 11 / 8.5,
-    "Legal": 14 / 8.5,
-    "Ledger": 17 / 11,
+    "A4": 1 / 2**0.5,  # Also applicable for other series
+    "Letter": 8.5 / 11,
+    "Legal": 8.5 / 14,
+    "Ledger": 11 / 17,
 }
 
 # inches
@@ -21,7 +21,7 @@ def get_half_ratio(ratio: float):
 
 
 def get_pixels_from_ppi(ratio, width: float, ppi: float = 72):
-    h = ratio * width * ppi
+    h = 1 / ratio * width * ppi
     w = width * ppi
     return (w, h)
 
