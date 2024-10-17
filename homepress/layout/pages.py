@@ -1,4 +1,4 @@
-ratios = {
+RATIOS: dict[str, float] = {
     "A4": 1 / 2**0.5,  # Also applicable for other series
     "Letter": 8.5 / 11,
     "Legal": 8.5 / 14,
@@ -6,27 +6,29 @@ ratios = {
 }
 
 # inches
-real_width = {"A4": 8.3, "Letter": 8.5, "Legal": 8.5, "Ledger": 11}
+REAL_WIDTH: dict[str, float] = {"A4": 8.3, "Letter": 8.5, "Legal": 8.5, "Ledger": 11}
 
 
-def get_ratio_width(name: str):
-    return (ratios[name], real_width[name])
+def get_ratio_width(name: str) -> tuple[float, float]:
+    return (RATIOS[name], REAL_WIDTH[name])
 
 
-def get_half_ratio(ratio: float):
+def get_half_ratio(ratio: float) -> float:
     """
     get ratio for half page
     """
     return 2 / ratio
 
 
-def get_pixels_from_ppi(ratio, width: float, ppi: float = 72):
+def get_pixels_from_ppi(
+    ratio: float, width: float, ppi: float = 72
+) -> tuple[float, float]:
     h = 1 / ratio * width * ppi
     w = width * ppi
     return (w, h)
 
 
-def clip(page, box):
+def clip(page: tuple[float, float], box: tuple[float, float]) -> tuple[float, float]:
     """
     Clip a page to given box
     """

@@ -1,5 +1,6 @@
 import threading
 import time
+from typing import Any
 
 
 class Progress:
@@ -36,6 +37,7 @@ class Progress:
         progress: int = 0,
         msg: str = "",
         callback: callable = None,
+        callback_threading: bool = False,
     ) -> None:
         self.total = total
         self.progress = progress
@@ -43,11 +45,12 @@ class Progress:
         self.exception = None
         self.failed = False
         self.callback = callback
+        self.callback_threading = callback_threading
         self._lock = threading.Lock()
         self.result = None
         self.thread: threading.Thread = None
 
-    def increment_progress(self, by=1):
+    def increment_progress(self, by: int = 1) -> None:
         """
         Function Method
 
@@ -55,14 +58,17 @@ class Progress:
         """
         with self._lock:
             self.progress += by
-            self._call_callback_in_thread()
+            self._call_callback()
 
-    def _call_callback_in_thread(self):
+    def _call_callback(self) -> None:
         if self.callback is None:
             return
-        threading.Thread(self.callback, args=(self,), daemon=True).start()
+        if self.callback_threading:
+            threading.Thread(self.callback, args=(self,), daemon=True).start()
+        else:
+            self.callback(self)
 
-    def set_progress(self, progress):
+    def set_progress(self, progress: int) -> None:
         """
         Function Method
 
@@ -70,9 +76,9 @@ class Progress:
         """
         with self._lock:
             self.progress = progress
-            self._call_callback_in_thread()
+            self._call_callback()
 
-    def set_total(self, total):
+    def set_total(self, total: int) -> None:
         """
         Function Method
 
@@ -81,7 +87,7 @@ class Progress:
         with self._lock:
             self.total = total
 
-    def set_msg(self, msg):
+    def set_msg(self, msg: str) -> None:
         """
         Function Method
 
@@ -90,7 +96,7 @@ class Progress:
         with self._lock:
             self.msg = msg
 
-    def fail(self, e):
+    def fail(self, e: Exception) -> None:
         """
         Function Method (Not to be used, errors raised are automatically handled by decorator)
         """
@@ -100,7 +106,7 @@ class Progress:
             self.exception = e
             self.failed = True
 
-    def complete(self, result=None):
+    def complete(self, result: Any = None) -> None:
         """
         Function Method (Not to be used, return values are automatically handled by decorator)
         """
@@ -108,7 +114,7 @@ class Progress:
             self.result = result
             self.progress = self.total
 
-    def check_fail(self):
+    def check_fail(self) -> None:
         """
         Check if the function failed, if it failed, then raise the associated error
         that is saved in self.exception
@@ -116,7 +122,7 @@ class Progress:
         if self.failed:
             raise self.exception
 
-    def sync(self):
+    def sync(self) -> Any:
         """
         Synchronise the underlying function to the main thread. Blocks until the underlying
         function has finished completion
@@ -125,7 +131,7 @@ class Progress:
         self.check_fail()
         return self.result
 
-    def sync_with_progress_bar(self, poll_delay=0.1):
+    def sync_with_progress_bar(self, poll_delay: float = 0.1) -> Any:
         """
         Synchronise the underlying function to the main thread while also displaying the
         progress to the standard output. Blocks until the underlying function has finished
@@ -147,21 +153,21 @@ class Progress:
         return self.sync()
 
     @property
-    def completed(self):
+    def completed(self) -> bool:
         """
         Check if the progress has completed or if its still alive
         """
         return not self.thread.is_alive()
 
     @property
-    def percent(self):
+    def percent(self) -> float:
         """
         Get the percentage value for the current progress as a float rounded off to 3 decimals
         """
         return round(100 * self.progress / self.total, 3)
 
 
-def runs_with_progress(func):
+def runs_with_progress(func: callable) -> callable:
     """
     A decorator to convert a function to run with progress
     The function should take a "progress" keyword argument of type `Progress`

@@ -5,7 +5,7 @@ from PIL.Image import Image
 from pymupdf import Pixmap, csRGB
 
 from ..layout.pages import clip
-from .renderer_abc import Renderer
+from .renderer_abc import Renderer, Size
 
 PIL.Image.init()
 
@@ -23,13 +23,13 @@ class PILRenderer(Renderer):
         k.strip(".") for k, v in PIL.Image.EXTENSION.items() if v in PIL.Image.OPEN
     ]
 
-    def __init__(self, file) -> None:
+    def __init__(self, file: Path | str) -> None:
         self.file = Path(file)
 
     def __len__(self) -> int:
         return 1
 
-    def render(self, page, size) -> Pixmap:
+    def render(self, page: int, size: Size) -> Pixmap:
         """
         Converts the given input image to a Pixmap based on the size.
         """
@@ -43,7 +43,7 @@ class PILRenderer(Renderer):
 
         return _pil_to_pixmap(im)
 
-    def render_preview(self, page) -> Pixmap:
+    def render_preview(self, page: int) -> Pixmap:
         """
         Scale down the image to a max of 420 in either dimensions and returns the
         pixmap after doing that

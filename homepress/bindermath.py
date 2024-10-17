@@ -6,7 +6,7 @@ type PageIndexType = int
 
 
 def doubleside_singlestack_midpage(
-    numpages,
+    numpages: int,
 ) -> list[
     tuple[tuple[PageIndexType, PageIndexType], tuple[PageIndexType, PageIndexType]]
 ]:

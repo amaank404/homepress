@@ -1,6 +1,7 @@
 import io
 import shutil
 from pathlib import Path
+from typing import Any, BinaryIO, SupportsIndex
 
 import pymupdf
 
@@ -18,7 +19,7 @@ def _flatten[T](l: list[list[T]]) -> list[T]:
 
 
 def _set_defaults_and_check_unknown(
-    opts: dict, defaults: dict, ignore_prefix: tuple = ()
+    opts: dict[str, Any], defaults: dict[str, Any], ignore_prefix: tuple[str] = ()
 ):
     for k, v in defaults.items():
         opts.setdefault(k, v)
@@ -43,15 +44,18 @@ class Press:
     """
 
     def __init__(
-        self, files: list[str, Path] | Renderer, ignore_errors=False, pages=None
+        self,
+        files: list[str | Path] | Renderer,
+        ignore_errors: bool = False,
+        pages: list[int | SupportsIndex[int]] = None,
     ) -> None:
         self.renderer = get_renderer(files, ignore_errors)
         if pages is not None:
             self.renderer = PageRangeRenderer(self.renderer, *pages)
 
-    def midpage_multi(self, output, **options) -> None:
+    def midpage_multi(self, output: str | Path | BinaryIO, **options) -> None:
         """
-        output: str, io_stream, folder_path - output pdf file path (should contain suffix .pdf)
+        output: str, Path, BinaryIO, folder_path - output pdf file path (should contain suffix .pdf)
 
         options:
         size: str, tuple[float, float] - Page Size (name or ratio (w/h), width in inches)
@@ -71,7 +75,7 @@ class Press:
 
     @progress.runs_with_progress
     def progress_midpage_multi(
-        self, output, *, progress: Progress = None, **options
+        self, output: str | Path | BinaryIO, *, progress: Progress = None, **options
     ) -> Progress:
         defaults = {
             "size": "A4",
@@ -159,7 +163,7 @@ class Press:
                 del output_streams[i]
             new_pdf.ez_save(output)
 
-    def midpage(self, output, **options) -> None:
+    def midpage(self, output: str | Path | BinaryIO, **options) -> None:
         """
         output: str, io_stream - output pdf file path (should contain suffix .pdf)
 
@@ -175,7 +179,7 @@ class Press:
 
     @progress.runs_with_progress
     def progress_midpage(
-        self, output, *, progress: Progress = None, **options
+        self, output: str | Path | BinaryIO, *, progress: Progress = None, **options
     ) -> Progress:
         defaults = {
             "size": "A4",
@@ -301,7 +305,7 @@ class Press:
         progress.set_msg("Saving output to PDF")
         new_file.ez_save(output)
 
-    def merge(self, output, **options) -> None:
+    def merge(self, output: str | Path | BinaryIO, **options) -> None:
         """
         output: str, io_stream - output pdf file path (should contain suffix .pdf)
 
@@ -312,7 +316,7 @@ class Press:
 
     @progress.runs_with_progress
     def progress_merge(
-        self, output, *, progress: Progress = None, **options
+        self, output: str | Path | BinaryIO, *, progress: Progress = None, **options
     ) -> Progress:
         defaults = {"resolution": (1600, 1600)}
         _set_defaults_and_check_unknown(options, defaults)
@@ -333,7 +337,7 @@ class Press:
         progress.set_msg("Saving output")
         new_file.ez_save(output)
 
-    def images(self, output, **options):
+    def images(self, output: str | Path, **options) -> None:
         """
         output: output_folder
 
@@ -347,7 +351,7 @@ class Press:
 
     @progress.runs_with_progress
     def progress_images(
-        self, output, *, progress: Progress = None, **options
+        self, output: str | Path, *, progress: Progress = None, **options
     ) -> Progress:
         path = Path(output)
         path.mkdir(exist_ok=True)

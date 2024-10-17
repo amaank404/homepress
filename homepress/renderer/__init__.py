@@ -9,16 +9,16 @@ from .renderer_abc import Renderer
 
 __all__ = ["get_renderer", "MultiRenderer", "PageRangeRenderer", "Renderer"]
 
-# All the supported renderers
-renderers = [MuPDFRenderer, PILRenderer]
+# All the supported real renderers
+renderers: list[Renderer] = [MuPDFRenderer, PILRenderer]
 
 # All the supported formats
-formats = set()
+formats: set[str] = set()
 for x in renderers:
     formats.update(x.supported_extensions)
 
 
-def get_renderer(files, ignore_errors=False):
+def get_renderer(files: list | Renderer, ignore_errors: bool = False) -> Renderer:
     """
     Given a set of files (May contain recursivly traversed folders), return a renderer that
     aggregates all the given files into a single renderer instance.
