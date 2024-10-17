@@ -1,7 +1,9 @@
+from pathlib import Path
+
 import pymupdf
 
 from ..layout.pages import clip
-from .renderer_abc import Renderer
+from .renderer_abc import Renderer, Size
 
 
 class MuPDFRenderer(Renderer):
@@ -23,10 +25,10 @@ class MuPDFRenderer(Renderer):
         "txt",
     ]
 
-    def __init__(self, file) -> None:
+    def __init__(self, file: str | Path) -> None:
         self.fp = pymupdf.open(file)
 
-    def render(self, page: int, size: tuple[int, int]) -> pymupdf.Pixmap:
+    def render(self, page: int, size: Size) -> pymupdf.Pixmap:
         page = self.fp[page]
         p_size = page.cropbox
         p_size = (p_size.width, p_size.height)
@@ -50,7 +52,7 @@ class MuPDFRenderer(Renderer):
         """
         return self.render(page, (420, 420), _render_format="jpg")  # 31 ppi for a4 size
 
-    def get_text(self, page) -> str:
+    def get_text(self, page: int) -> str:
         """
         Get text from the given page
         """

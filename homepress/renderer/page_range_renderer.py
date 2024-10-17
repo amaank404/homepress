@@ -1,10 +1,14 @@
+from typing import SupportsIndex
+
 from pymupdf import Pixmap
 
-from .renderer_abc import Renderer
+from .renderer_abc import Renderer, Size
 
 
 class PageRangeRenderer(Renderer):
-    def __init__(self, renderer: Renderer, *page_range) -> None:
+    def __init__(
+        self, renderer: Renderer, *page_range: list[int | SupportsIndex[int]]
+    ) -> None:
         self.renderer = renderer
         self.pages = []
         for x in page_range:
@@ -23,11 +27,11 @@ class PageRangeRenderer(Renderer):
     def __len__(self) -> int:
         return len(self.pages)
 
-    def render(self, page, size) -> Pixmap:
+    def render(self, page: int, size: Size) -> Pixmap:
         return self.renderer.render(self.pages[page], size)
 
-    def render_preview(self, page) -> Pixmap:
+    def render_preview(self, page: int) -> Pixmap:
         return self.renderer.render_preview(self.pages[page])
 
-    def get_text(self, page) -> str:
+    def get_text(self, page: int) -> str:
         return self.renderer.get_text(self.pages[page])

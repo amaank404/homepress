@@ -2,11 +2,12 @@ import json
 import sys
 import textwrap
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
+from typing import Sized, SupportsIndex
 
 from . import Press, __homepage__, __version__, layout, renderer
 
 
-def get_formats():
+def get_formats() -> str:
     CHUNK_SIZE = 10
     ret = ""
     formats = list(renderer.formats)
@@ -16,8 +17,8 @@ def get_formats():
     return ret[:-1]
 
 
-def page_size(v: str):
-    if v in layout.pages.ratios:
+def page_size(v: str) -> str | tuple[float, float]:
+    if v in layout.pages.RATIOS:
         return v
 
     t = tuple(map(float, v.split(",")))
@@ -29,7 +30,7 @@ def page_size(v: str):
     )
 
 
-def resolution(v: str):
+def resolution(v: str) -> tuple[float, float]:
     t = tuple(map(float, v.split(",")))
     if len(t) == 2:
         return t
@@ -38,7 +39,7 @@ def resolution(v: str):
     )
 
 
-def page_ranges(v: str):
+def page_ranges(v: str) -> list[int | SupportsIndex[int]]:
     pages = []
     a = v.split(",")
     for x in a:
@@ -49,36 +50,36 @@ def page_ranges(v: str):
     return pages
 
 
-def minlen1input(v):
+def minlen1input(v: Sized) -> Sized:
     if len(v) >= 1:
         return v
     raise TypeError("Atleast one input file is required")
 
 
-def pil_arg(v: str):
+def pil_arg(v: str) -> tuple[str, int | float | dict | list | str]:
     k, v = v.split("=", 1)
     try:
         v = int(v)
         return k, v
-    finally:
+    except:
         pass
 
     try:
         v = float(v)
         return k, v
-    finally:
+    except:
         pass
 
     try:
-        v = json.loads(v)
+        v = json.loads(v.replace("'", '"'))
         return k, v
-    finally:
+    except:
         pass
 
     return k, v
 
 
-def app(args=None):
+def app(args=None) -> None:
     if not args:
         args = sys.argv[1:]
 
@@ -142,7 +143,7 @@ intensive.
         parser.add_argument(
             "-s",
             "--size",
-            help=f"output document page size, defaults to 'A4', valid values can be {', '.join(layout.pages.ratios)} or a comma separated value defining 'w/h_ratio,width_in_inches'",
+            help=f"output document page size, defaults to 'A4', valid values can be {', '.join(layout.pages.RATIOS)} or a comma separated value defining 'w/h_ratio,width_in_inches'",
             type=page_size,
             default="A4",
         )
