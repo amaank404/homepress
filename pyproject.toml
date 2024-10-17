@@ -1,21 +1,21 @@
 [tool.poetry]
 name = "homepress"
-version = "0.3.1"
-description = "An All in One Home based book printing software solution. Can be used as a library."
-authors = ["Amaan Ahmad Khan"]
-license = "MIT License"
+version = "2.0.0"
+description = "A swiss army knife of PDF printing and other documents. Can be used as a library."
+authors = ["Amaan Ahmad Khan <71920621+amaank404@users.noreply.github.com>"]
+license = "MIT"
 readme = "README.md"
+repository= "https://github.com/amaank404/homepress"
 packages = [{include = "homepress"}]
 
 [tool.poetry.dependencies]
-python = "^3.9"
-pypdf = "^3.16.3"
-tqdm = "^4.66.1"
-
+python = "^3.12"
+PyMuPDF = "^1.24.10"
+pillow = "^10.4.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-homepress = "homepress.cli:run"
+homepress = "homepress.cli:app"
