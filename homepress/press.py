@@ -47,7 +47,7 @@ class Press:
         self,
         files: list[str | Path] | Renderer,
         ignore_errors: bool = False,
-        pages: list[int | SupportsIndex[int]] = None,
+        pages: list[int | SupportsIndex] = None,
     ) -> None:
         self.renderer = get_renderer(files, ignore_errors)
         if pages is not None:

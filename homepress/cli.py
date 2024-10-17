@@ -39,7 +39,7 @@ def resolution(v: str) -> tuple[float, float]:
     )
 
 
-def page_ranges(v: str) -> list[int | SupportsIndex[int]]:
+def page_ranges(v: str) -> list[int | SupportsIndex]:
     pages = []
     a = v.split(",")
     for x in a:
@@ -102,6 +102,7 @@ The input files are rendered into image files and thus, this program is memory
 intensive.
 """,
         formatter_class=RawDescriptionHelpFormatter,
+        epilog="Hope you have a great day!",
     )
 
     # Root parser options
@@ -109,10 +110,18 @@ intensive.
         "-v", "--version", version="Homepress v" + __version__, action="version"
     )
 
-    # Subparsers at root level
-    subparser = parser.add_subparsers(
-        dest="_root_command", required=True, metavar="root_commands"
+    grp = parser.add_mutually_exclusive_group()
+    grp.add_argument(
+        "--formats", help="prints a list of available formats", action="store_true"
     )
+    grp.add_argument(
+        "--page-sizes",
+        help="prints a list of available named page sizes",
+        action="store_true",
+    )
+
+    # Subparsers at root level
+    subparser = parser.add_subparsers(dest="_root_command", metavar="root_commands")
     subparser_press = subparser.add_parser("press", help="the default press")
     subparser_press.add_argument(
         "-i",
@@ -267,6 +276,12 @@ intensive.
     )
 
     args = parser.parse_args(args)
+    if args.formats:
+        print(" ".join(renderer.formats))
+        return 0
+    elif args.page_sizes:
+        print(" ".join(layout.pages.RATIOS.keys()))
+        return 0
 
     match args._root_command:
         case "press":
@@ -315,4 +330,6 @@ intensive.
                 case _:
                     raise TypeError(f"Unknown press command")
         case _:
-            raise TypeError("Unknown command supplied")
+            parser.print_help()
+            return 1
+    return 0

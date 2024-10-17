@@ -7,7 +7,7 @@ from .renderer_abc import Renderer, Size
 
 class PageRangeRenderer(Renderer):
     def __init__(
-        self, renderer: Renderer, *page_range: list[int | SupportsIndex[int]]
+        self, renderer: Renderer, *page_range: list[int | SupportsIndex]
     ) -> None:
         self.renderer = renderer
         self.pages = []
