@@ -1,3 +1,5 @@
+![banner_image](logo/banner.png)
+
 # Homepress
 
 Converts your documents of a multitude of types into several different formats

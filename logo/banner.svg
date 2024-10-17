@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="820"
+   height="462"
+   viewBox="0 0 820 462"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   sodipodi:docname="banner.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     inkscape:zoom="1.5340768"
+     inkscape:cx="377.75163"
+     inkscape:cy="243.14298"
+     inkscape:window-width="2560"
+     inkscape:window-height="1494"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#swatch18"
+       id="linearGradient19"
+       gradientUnits="userSpaceOnUse"
+       x1="9.3565216"
+       y1="256"
+       x2="502.64349"
+       y2="256" />
+    <linearGradient
+       id="swatch18"
+       inkscape:label="Gradient1">
+      <stop
+         style="stop-color:#3f3f3f;stop-opacity:1;"
+         offset="0"
+         id="stop18" />
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0.5"
+         id="stop20" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0.5"
+         id="stop21" />
+      <stop
+         style="stop-color:#e1e1e1;stop-opacity:1;"
+         offset="1"
+         id="stop19" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient24"
+       id="linearGradient25"
+       x1="83.80368"
+       y1="264.7767"
+       x2="431.12186"
+       y2="264.7767"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0504966,0,0,1.0504966,-14.463813,-22.147021)" />
+    <linearGradient
+       id="linearGradient24"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#f0f1b0;stop-opacity:1;"
+         offset="0"
+         id="stop24" />
+      <stop
+         style="stop-color:#ffea25;stop-opacity:1;"
+         offset="0.5"
+         id="stop26" />
+      <stop
+         style="stop-color:#161600;stop-opacity:1;"
+         offset="0.5"
+         id="stop27" />
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="1"
+         id="stop25" />
+    </linearGradient>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:#1f1f1f;fill-opacity:1;stroke:none;stroke-width:3.01202;stroke-linecap:square;stroke-linejoin:bevel"
+       id="rect1"
+       width="793.96289"
+       height="360.47739"
+       x="16.296446"
+       y="52.148628"
+       ry="40.546764" />
+    <g
+       id="g27"
+       transform="matrix(0.59579622,0,0,0.59579622,37.979159,84.265642)">
+      <circle
+         style="fill:url(#linearGradient19);fill-opacity:1;stroke:none;stroke-width:13.96;stroke-linecap:square;stroke-linejoin:bevel;stroke-dasharray:none;stroke-opacity:1"
+         id="path3"
+         cx="256"
+         cy="256"
+         r="246.64348" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:166.886px;font-family:'Yu Mincho';-inkscape-font-specification:'Yu Mincho, Normal ';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:17.6801px;word-spacing:17.6801px;writing-mode:tb-rl;text-anchor:middle;fill:none;fill-opacity:1;stroke:url(#linearGradient25);stroke-width:3.42777;stroke-linecap:square;stroke-linejoin:bevel;stroke-dasharray:none;stroke-opacity:1"
+         x="363.44101"
+         y="264.10666"
+         id="text2"><tspan
+           sodipodi:role="line"
+           id="tspan12"
+           x="363.44101"
+           y="264.10666"
+           style="letter-spacing:17.6801px;word-spacing:17.6801px;fill:none;stroke:url(#linearGradient25);stroke-width:3.42777;stroke-dasharray:none;stroke-opacity:1">家印</tspan><tspan
+           sodipodi:role="line"
+           id="tspan13"
+           x="154.83351"
+           y="264.10666"
+           style="letter-spacing:17.6801px;word-spacing:17.6801px;fill:none;stroke:url(#linearGradient25);stroke-width:3.42777;stroke-dasharray:none;stroke-opacity:1">刷機</tspan><tspan
+           sodipodi:role="line"
+           id="tspan14"
+           x="-53.773994"
+           y="264.10666"
+           style="letter-spacing:17.6801px;word-spacing:17.6801px;fill:none;stroke:url(#linearGradient25);stroke-width:3.42777;stroke-dasharray:none;stroke-opacity:1" /></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:113.668px;font-family:'Yu Mincho';-inkscape-font-specification:'Yu Mincho, Normal ';text-align:start;letter-spacing:16.5999px;word-spacing:16.5999px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:5.41655;stroke-linecap:square;stroke-linejoin:bevel"
+       x="378.72672"
+       y="207.58766"
+       id="text1"><tspan
+         sodipodi:role="line"
+         id="tspan1"
+         x="378.72672"
+         y="207.58766"
+         style="stroke-width:5.41655">Home</tspan><tspan
+         sodipodi:role="line"
+         x="378.72672"
+         y="349.67264"
+         id="tspan2"
+         style="stroke-width:5.41655">Press</tspan></text>
+  </g>
+</svg>

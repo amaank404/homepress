@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="512"
+   height="512"
+   viewBox="0 0 512 512"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   sodipodi:docname="logo-ja-2.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     inkscape:zoom="1.3672573"
+     inkscape:cx="200.03551"
+     inkscape:cy="247.21024"
+     inkscape:window-width="1269"
+     inkscape:window-height="1481"
+     inkscape:window-x="-9"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <circle
+       style="fill:#eb0000;fill-opacity:1;stroke:none;stroke-width:13.96;stroke-linecap:square;stroke-linejoin:bevel;stroke-dasharray:none;stroke-opacity:1"
+       id="path3"
+       cx="256"
+       cy="256"
+       r="246.64348" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:158.864px;font-family:'Yu Mincho';-inkscape-font-specification:'Yu Mincho, Normal ';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;letter-spacing:16.8302px;word-spacing:16.8302px;writing-mode:tb-rl;text-anchor:middle;fill:#ffea25;fill-opacity:1;stroke:#ffea25;stroke-width:2.36300011;stroke-linecap:square;stroke-linejoin:bevel;stroke-dasharray:none;stroke-opacity:1"
+       x="358.27646"
+       y="263.71698"
+       id="text2"><tspan
+         sodipodi:role="line"
+         id="tspan12"
+         x="358.27646"
+         y="263.71698"
+         style="letter-spacing:16.8302px;word-spacing:16.8302px;stroke:#ffea25;stroke-width:2.36300011;stroke-dasharray:none;stroke-opacity:1">家印</tspan><tspan
+         sodipodi:role="line"
+         id="tspan13"
+         x="159.69646"
+         y="263.71698"
+         style="letter-spacing:16.8302px;word-spacing:16.8302px;stroke:#ffea25;stroke-width:2.36300011;stroke-dasharray:none;stroke-opacity:1">刷機</tspan><tspan
+         sodipodi:role="line"
+         id="tspan14"
+         x="-38.883537"
+         y="263.71698"
+         style="letter-spacing:16.8302px;word-spacing:16.8302px;stroke:#ffea25;stroke-width:2.36300011;stroke-dasharray:none;stroke-opacity:1"></tspan></text>
+  </g>
+</svg>
