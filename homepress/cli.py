@@ -254,7 +254,7 @@ intensive.
     image_parser.add_argument(
         "-fmt",
         "--format",
-        help="image file format to use to save the image, 'png', 'jpg' are stored using pymupdf, other file formats are stored using PIL (Pillow), defaults to png",
+        help="image file format to use to save the image, 'png' is stored using pymupdf, other file formats are stored using PIL (Pillow), defaults to png",
         default="png",
     )
     image_parser.add_argument(
@@ -263,6 +263,7 @@ intensive.
         help="options to pass to pil saver, formatted as key=value, value is autoconverted to integer or float if the value is parsable as such",
         action="append",
         default=[],
+        metavar="KEY=VALUE",
         type=pil_arg,
     )
 
