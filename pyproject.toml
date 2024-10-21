@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "homepress"
-version = "2.0.0"
+version = "2.0.1"
 description = "A swiss army knife of PDF printing and other documents. Can be used as a library."
 authors = ["Amaan Ahmad Khan <71920621+amaank404@users.noreply.github.com>"]
 license = "MIT"
 readme = "README.md"
-repository= "https://github.com/amaank404/homepress"
-packages = [{include = "homepress"}]
+repository = "https://github.com/amaank404/homepress"
+packages = [{ include = "homepress" }]
 
 [tool.poetry.dependencies]
 python = "^3.12"
