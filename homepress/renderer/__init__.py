@@ -40,6 +40,8 @@ def get_renderer(files: list | Renderer, ignore_errors: bool = False) -> Rendere
                 for x in renderers:
                     if ext in x.supported_extensions:
                         return x(files[0])
+        elif not path.exists():
+            raise FileNotFoundError(f"File not found: {path}")
         raise TypeError(f"File format not supported for {path}")
 
     else:
