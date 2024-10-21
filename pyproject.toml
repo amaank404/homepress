@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "homepress"
-version = "2.0.1"
+version = "2.0.2"
 description = "A swiss army knife of PDF printing and other documents. Can be used as a library."
 authors = ["Amaan Ahmad Khan <71920621+amaank404@users.noreply.github.com>"]
 license = "MIT"

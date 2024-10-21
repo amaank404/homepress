@@ -50,7 +50,7 @@ class MuPDFRenderer(Renderer):
         Renders a preview of the given page, with a resolution of 420 max in either
         of the dimensions.
         """
-        return self.render(page, (420, 420), _render_format="jpg")  # 31 ppi for a4 size
+        return self.render(page, (420, 420))  # 31 ppi for a4 size
 
     def get_text(self, page: int) -> str:
         """
