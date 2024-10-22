@@ -17,7 +17,6 @@ class MuPDFRenderer(Renderer):
         "pdf",
         "epub",
         "cbz",
-        "cbr",
         "fb2",
         "xps",
         "mobi",
@@ -29,6 +28,9 @@ class MuPDFRenderer(Renderer):
         self.fp = pymupdf.open(file)
 
     def render(self, page: int, size: Size) -> pymupdf.Pixmap:
+        if min(size) <= 0:
+            raise ValueError(f"Resolution has to be non-zero: {size}")
+
         page = self.fp[page]
         p_size = page.cropbox
         p_size = (p_size.width, p_size.height)

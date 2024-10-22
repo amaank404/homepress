@@ -25,6 +25,8 @@ class PILRenderer(Renderer):
 
     def __init__(self, file: Path | str) -> None:
         self.file = Path(file)
+        if not self.file.exists():
+            raise FileNotFoundError(f'file "{self.file}" not found')
 
     def __len__(self) -> int:
         return 1
@@ -33,6 +35,12 @@ class PILRenderer(Renderer):
         """
         Converts the given input image to a Pixmap based on the size.
         """
+        if page != 0:
+            raise IndexError("Image files only support index 0")
+
+        if min(size) <= 0:
+            raise ValueError(f"render resolution can't be zero: {size}")
+
         im = PIL.Image.open(self.file).convert("RGBA")
 
         clipped_size = clip(im.size, size)
@@ -48,4 +56,6 @@ class PILRenderer(Renderer):
         Scale down the image to a max of 420 in either dimensions and returns the
         pixmap after doing that
         """
+        if page != 0:
+            raise IndexError("Image files only support index 0")
         return self.render(page, size=(420, 420))
