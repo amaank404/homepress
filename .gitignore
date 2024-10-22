@@ -1,6 +1,10 @@
-*.pdf
+/*.pdf
+cache/
 __pycache__/
 dist/
 temp.py
 temp_data/
 output/
+.env
+.vscode/
+.coverage
