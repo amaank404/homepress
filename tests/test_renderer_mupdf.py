@@ -1,3 +1,5 @@
+import logging
+
 import data
 import pytest
 
@@ -24,6 +26,7 @@ def test_render_preview(mupdf_renderer: MuPDFRenderer):
 
 @pytest.mark.parametrize("res", [0, 1, 64])
 def test_render(mupdf_renderer: MuPDFRenderer, res):
+    logging.info(f"render test for: {mupdf_renderer.file}")
     for x in range(len(mupdf_renderer)):
         if res <= 0:
             with pytest.raises(ValueError):

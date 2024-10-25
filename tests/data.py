@@ -44,7 +44,7 @@ d = datefile.read_text().strip()
 try:
     d = int(d)
 except ValueError:
-    d = int(time.time())
+    d = 0
 
 if (d + (7 * 86400)) > time.time():
     print("Using cached data")
@@ -66,7 +66,7 @@ else:
     c = repo.get_contents("files.json")
     d = requests.get(c.download_url).json()
     print("- Sample PDF data")
-    for x in tqdm.tqdm(d["data"][:3]):
+    for x in tqdm.tqdm(d["data"]):
         fpath = x["path"]
         getfile(
             repo.get_contents(fpath).download_url,
@@ -84,12 +84,12 @@ class TestData:
         assert self.data_folder.exists(), "Data folder doesn't exist"
 
         for r, d, f in Path(self.data_folder).walk():
-            self.files.extend((Path(self.data_folder) / r / x) for x in f)
+            self.files.extend(
+                (Path(self.data_folder) / r / x) for x in f if "password" not in x
+            )
 
     def filter_extension(self, extensions):
         return filter(lambda x: x.suffix.strip(".") in extensions, self.files)
 
 
 dataset = TestData(root)
-
-print(list(dataset.filter_extension(["cbr"])))

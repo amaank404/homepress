@@ -1,3 +1,5 @@
+import logging
+
 import data
 import PIL.Image
 import pytest
@@ -19,6 +21,7 @@ def test_render_preview(pil_renderer: PILRenderer):
 
 @pytest.mark.parametrize("res", [0, 1, 64])
 def test_render(pil_renderer: PILRenderer, res):
+    logging.info(f"render test for: {pil_renderer.file}")
     im = PIL.Image.open(pil_renderer.file).convert("RGBA")
     if res <= 0 or (max(im.size) / min(im.size) > res):
         with pytest.raises(ValueError):
