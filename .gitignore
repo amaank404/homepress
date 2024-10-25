@@ -8,3 +8,4 @@ output/
 .env
 .vscode/
 .coverage
+.pytest_cache
