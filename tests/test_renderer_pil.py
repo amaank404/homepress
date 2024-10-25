@@ -38,4 +38,3 @@ def test_out_of_range(pil_renderer: PILRenderer):
 def test_file_exists():
     with pytest.raises(FileNotFoundError):
         renderer = PILRenderer("asbsladoibibqwiogriobibhgioiovhaoivhgiovhgiovhari.png")
-        renderer.render(1, (1000, 1000))

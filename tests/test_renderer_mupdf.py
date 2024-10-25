@@ -46,4 +46,3 @@ def test_file_exists():
         renderer = MuPDFRenderer(
             "asbsladoibibqwiogriobibhgioiovhaoivhgiovhgiovhari.pdf"
         )
-        renderer.render(1, (1000, 1000))

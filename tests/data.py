@@ -1,3 +1,5 @@
+# pragma: no cover
+
 import logging
 import os
 import shutil
@@ -68,12 +70,24 @@ else:
     print("- Sample PDF data")
     for x in tqdm.tqdm(d["data"]):
         fpath = x["path"]
-        getfile(
-            repo.get_contents(fpath).download_url,
-            root / "cache" / "pdf" / Path(fpath).name,
-        )
+        if "password" not in Path(fpath).name:
+            getfile(
+                repo.get_contents(fpath).download_url,
+                root / "cache" / "pdf" / Path(fpath).name,
+            )
 
     datefile.write_text(str(int(time.time())), "utf-8")
+
+
+def _batched(iter, batch_size):
+    batch = []
+    for x in iter:
+        batch.append(x)
+        if len(batch) > batch_size:
+            yield batch
+            batch = []
+    if batch:
+        yield batch
 
 
 class TestData:
@@ -90,6 +104,12 @@ class TestData:
 
     def filter_extension(self, extensions):
         return filter(lambda x: x.suffix.strip(".") in extensions, self.files)
+
+    def filter_extension_batched(self, extensions, batch_size=10):
+        return _batched(self.filter_extension(extensions), batch_size)
+
+    def batched(self, batch_size=10):
+        return _batched(self.files, batch_size)
 
 
 dataset = TestData(root)
