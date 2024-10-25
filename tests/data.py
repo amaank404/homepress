@@ -12,7 +12,7 @@ from github import Github
 
 root = Path(__file__).resolve().parent
 
-load_dotenv(dotenv_path=(root.parent / ".env"), override=True)
+load_dotenv(dotenv_path=(root / ".env"), override=True)
 
 dirstruct = ["cache", "cache/pdf"]
 
