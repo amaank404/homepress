@@ -1,4 +1,5 @@
 import data
+import PIL.Image
 import pytest
 
 from homepress.renderer.pil_renderer import PILRenderer
@@ -18,7 +19,8 @@ def test_render_preview(pil_renderer: PILRenderer):
 
 @pytest.mark.parametrize("res", [0, 1, 64])
 def test_render(pil_renderer: PILRenderer, res):
-    if res <= 0:
+    im = PIL.Image.open(pil_renderer.file).convert("RGBA")
+    if res <= 0 or (max(im.size) / min(im.size) > res):
         with pytest.raises(ValueError):
             pil_renderer.render(0, (res, res))
     else:
@@ -28,3 +30,9 @@ def test_render(pil_renderer: PILRenderer, res):
 def test_out_of_range(pil_renderer: PILRenderer):
     with pytest.raises(IndexError):
         pil_renderer.render(1, (64, 64))
+
+
+def test_file_exists():
+    with pytest.raises(FileNotFoundError):
+        renderer = PILRenderer("asbsladoibibqwiogriobibhgioiovhaoivhgiovhgiovhari.png")
+        renderer.render(1, (1000, 1000))
