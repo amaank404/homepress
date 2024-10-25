@@ -5,7 +5,7 @@ from pymupdf import Pixmap
 type Size = tuple[float, float]
 
 
-class Renderer:
+class Renderer:  # pragma: no cover
     supported_extensions: list[str] = []
 
     def __init__(self, file: str | Path) -> None:

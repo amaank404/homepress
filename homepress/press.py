@@ -100,6 +100,8 @@ class Press:
         progress.set_msg("Calculating stack sizes")
         stack_size = options["stack_size"]
 
+        assert stack_size % 4 == 0, "Stack size must be a multiple of 4"
+
         num_stacks = total_pages // stack_size
         extra_pages = total_pages % stack_size
         total_naming_digits = len(str(num_stacks))
@@ -118,6 +120,11 @@ class Press:
         output_streams = (
             []
         )  # Used to save pdf results in memory if the pdf needs to be mergeed at the end
+
+        # Make sure the stack ranges don't exceed the amount of available pages
+        decided_stack_ranges[-1] = decided_stack_ranges[-1][0], min(
+            decided_stack_ranges[-1][1], total_pages
+        )
 
         for current_stack, current_stack_range in enumerate(decided_stack_ranges):
             progress.set_msg(f"Rendering stack {current_stack+1}")
