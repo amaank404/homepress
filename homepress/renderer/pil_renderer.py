@@ -43,6 +43,12 @@ class PILRenderer(Renderer):
 
         im = PIL.Image.open(self.file).convert("RGBA")
 
+        # Check for minimum sizes
+        if (min_size := max(im.size) / min(im.size)) > min(size):
+            raise ValueError(
+                f"resolution {size} is shorter than the min resolution requirement: ({min_size}, {min_size})"
+            )
+
         clipped_size = clip(im.size, size)
         if (
             clipped_size[0] * clipped_size[1] < im.width * im.height
