@@ -1,3 +1,4 @@
+import array
 from pathlib import Path
 
 import pymupdf
@@ -25,11 +26,31 @@ class MuPDFRenderer(Renderer):
     ]
 
     def __init__(self, file: str | Path) -> None:
-        self.fp = pymupdf.open(file)
+        self.file = Path(file)
+        if not self.file.exists():
+            raise FileNotFoundError(f'file "{self.file}" not found')
+
+        self.fp = None
+
+    def _lazy_load(self) -> None:
+        """
+        Lazy loads the pdf file
+        """
+        if self.fp is None:
+            self.fp = pymupdf.open(self.file)
+            self.used = [False for x in range(len(self))]
+
+    def _lazy_unload(self) -> None:
+        if all(self.used):
+            self.fp.close()
+            del self.fp, self.used
 
     def render(self, page: int, size: Size) -> pymupdf.Pixmap:
+        self._lazy_load()
         if min(size) <= 0:
             raise ValueError(f"Resolution has to be non-zero: {size}")
+
+        self.used[page] = True
 
         page = self.fp[page]
         p_size = page.cropbox
@@ -58,9 +79,11 @@ class MuPDFRenderer(Renderer):
         """
         Get text from the given page
         """
+        self._lazy_load()
         page = self.fp[page]
         txt = page.get_text()
         return txt
 
     def __len__(self):
+        self._lazy_load()
         return self.fp.page_count
