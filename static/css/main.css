@@ -16,6 +16,7 @@ body {
     --banner: black;
     --background: #111;
     --text: white;
+    --banner-blur: #003856;
 }
 
 body {
@@ -38,6 +39,48 @@ body {
     background-color: var(--banner);
     flex-direction: column;
     overflow: hidden;
+    position: relative;
+}
+
+.banner-blur::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    clip-path: polygon(47% 94%, 31% 85%, 15% 88%, 7% 57%, 30% 35%, 17% 17%, 7% 10%, 15% 6%, 38% 3%, 49% 11%, 49% 28%, 41% 38%, 42% 49%, 58% 31%, 76% 16%, 91% 29%, 95% 53%, 65% 87%);
+    background-color: var(--banner-blur);
+    opacity: 1;
+}
+
+.banner-blur {
+    position: absolute;
+    width: 70vw;
+    height: 70vw;
+    max-width: 600px;
+    max-height: 600px;
+    filter: blur(100px);
+    transition: opacity 3s ease 1s;
+    opacity: 1;
+}
+
+.opacity-0 {
+    opacity: 0;
+}
+
+.animation-glow {
+    animation-name: glow;
+    animation-duration: 4s;
+    animation-timing-function: ease;
+    animation-iteration-count: infinite;
+}
+
+@keyframes glow {
+    0% {opacity: 0.6;}
+    50% {opacity: 1;}
+    100% {opacity: 0.6;}
 }
 
 .title {
@@ -56,8 +99,9 @@ body {
 .logo-text {
     writing-mode: vertical-rl;
     text-orientation: upright;
-    font-size: 5rem;
-    letter-spacing: 0.3ch;
+    font-size: 6rem;
+    letter-spacing: 0;
+    line-height: 1;
     font-family: 'Zen Old Mincho', serif;
 
     -webkit-text-fill-color: transparent; /* Will override color (regardless of order) */
@@ -86,7 +130,6 @@ body {
     .logo-text {
         writing-mode: lr;
         text-orientation: unset;
-        letter-spacing: normal;
         text-wrap: nowrap;
     }
 

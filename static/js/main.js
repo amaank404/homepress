@@ -1,0 +1,1 @@
+$(".banner-blur").removeClass("opacity-0").addClass("animation-glow");
