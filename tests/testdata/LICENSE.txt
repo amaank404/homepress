@@ -1,9 +1,0 @@
-The majority of this project is licensed under MIT License,
-This includes the codebase and other assets. A list of exceptions
-is provided below, along with the license for each one. When
-using these assets, please be mindful that you are using the
-correct license.
-
-* test/testdata/childrens-literature.epub is licensed under CC-BY-SA and obtained from https://idpf.github.io/epub3-samples/30/samples.html
-* the directory test/testdata/clach04_sample_reading_media is licensed under LGPL-2.1 license and a copy of the same is at test/testdata/clach04_sample_reading_media/LICENSE file
-* files under the directory test/testdata/filesamples.com are obtained from https://filesamples.com and may adhere to Terms and Conditions given by https://filesamples.com website
