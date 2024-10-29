@@ -16,6 +16,7 @@ body {
     --banner: black;
     --background: #111;
     --text: white;
+    --text-light: #aaa;
     --banner-blur: #003856;
 }
 
@@ -86,6 +87,7 @@ body {
 .title {
     font-size: 8em;
     position: relative;
+    transform: scale(calc(1 + var(--scrolly)*0.01));
 }
 
 .playfair {
@@ -103,6 +105,8 @@ body {
     letter-spacing: 0;
     line-height: 1;
     font-family: 'Zen Old Mincho', serif;
+    
+    text-wrap: nowrap;
 
     -webkit-text-fill-color: transparent; /* Will override color (regardless of order) */
     -webkit-text-stroke-width: 1px;
@@ -113,9 +117,9 @@ body {
     position: absolute;
     display: flex;
     flex-direction: row-reverse;
-    bottom: 100%;
+    bottom: calc(100% - var(--scrolly)*0.5%);
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) scale(calc(1 + var(--scrolly)*0.002));
 }
 
 .content {
@@ -130,7 +134,6 @@ body {
     .logo-text {
         writing-mode: lr;
         text-orientation: unset;
-        text-wrap: nowrap;
     }
 
     .logo-container {
